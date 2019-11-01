@@ -1,0 +1,57 @@
+<div class="dt-listbox-panel">
+  <label>{{sourceTitle}}</label>
+  <div class="dt-list-menu" #sourceList appDroppable [dragElementEvent]="dragElementEvent" (dropElement)="onDropSource($event)">
+    <div class="dt-list-menu-item"
+        *ngFor="let option of source; index as i"
+        (click)="sourceModel = option.id"
+        [ngClass]="{'active': sourceModel === option.id}"
+        [draggable]="true"
+        (dragstart)="onDragStart($event, i); sourceModel = option.id">
+        {{option.name}}
+    </div>
+  </div>
+</div>
+
+<div class="dt-listbox-panel">
+  <button class="dt-button" (click)="moveRightAll()" title="move all to the right">
+    <i class="dt-icon-quotation-r large"></i>
+  </button>
+  <button class="dt-button" (click)="moveRight()" [disabled]="isBlankSourceModel" title="move selected to the right">
+    <i class="dt-icon-arrow-right large"></i>
+  </button>
+  <button class="dt-button" (click)="moveLeft()" [disabled]="isBlankTargetModel" title="move selected to the left">
+    <i class="dt-icon-arrow-left large"></i>
+  </button>
+  <button class="dt-button" (click)="moveLeftAll()" title="move all to the left">
+    <i class="dt-icon-quotation-l large"></i>
+  </button>
+</div>
+
+<div class="dt-listbox-panel">
+  <label>{{targetTitle}}</label>
+  <div class="dt-list-menu" #targetList appDroppable [dragElementEvent]="dragElementEvent" (dropElement)="onDropTarget($event)">
+    <div class="dt-list-menu-item"
+        *ngFor="let option of target; index as i"
+        (click)="targetModel = option.id"
+        [ngClass]="{'active': targetModel === option.id}"
+        [draggable]="true"
+        (dragstart)="onDragStart($event, i); targetModel = option.id">
+        {{option.name}}
+    </div>
+  </div>
+</div>
+
+<div class="dt-listbox-panel">
+  <button class="dt-button" (click)="moveTop()" [disabled]="isBlankTargetModel" title="move top">
+    <i class="dt-icon-tab-up large"></i>
+  </button>
+  <button class="dt-button" (click)="moveUp()" [disabled]="isBlankTargetModel" title="move up">
+    <i class="dt-icon-arrow-up large"></i>
+  </button>
+  <button class="dt-button" (click)="moveDown()" [disabled]="isBlankTargetModel" title="move down">
+    <i class="dt-icon-arrow-down large"></i>
+  </button>
+  <button class="dt-button" (click)="moveBottom()" [disabled]="isBlankTargetModel" title="move bottom">
+    <i class="dt-icon-tab-down large"></i>
+  </button>
+</div>

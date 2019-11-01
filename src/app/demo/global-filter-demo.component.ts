@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Column, CdtSettings, DataTable, DataManager} from '../../lib/ng-crud-table';
+import {CdtSettings, DataTable, DataManager} from 'ng-mazdik-lib';
 import {DemoService} from './demo.service';
 import {getColumnsPlayers} from './columns';
 
@@ -17,7 +17,6 @@ import {getColumnsPlayers} from './columns';
 export class GlobalFilterDemoComponent implements OnInit {
 
   table: DataTable;
-  columns: Column[];
   dataManager: DataManager;
 
   settings: CdtSettings;
@@ -26,17 +25,14 @@ export class GlobalFilterDemoComponent implements OnInit {
   });
 
   constructor(private service: DemoService, private http: HttpClient) {
-    this.columns = getColumnsPlayers();
-    for (const column of this.columns) {
-      column.editable = false;
-    }
-    this.table = new DataTable(this.columns, this.settings);
-    this.dataManager = new DataManager(this.columns, this.serverSideSettings, this.service);
+    const columns = getColumnsPlayers();
+    this.table = new DataTable(columns, this.settings);
+    this.dataManager = new DataManager(columns, this.serverSideSettings, this.service);
   }
 
   ngOnInit() {
     this.table.events.onLoading(true);
-    this.http.get('assets/players.json').subscribe(data => {
+    this.http.get<any[]>('assets/players.json').subscribe(data => {
       this.table.rows = data;
       this.table.events.onLoading(false);
     });

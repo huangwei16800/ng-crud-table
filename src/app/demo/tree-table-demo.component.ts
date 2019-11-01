@@ -1,10 +1,9 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Column, Settings, TreeTable} from '../../lib/ng-tree-table';
+import {TreeTable, Settings, TreeBuilder} from 'ng-mazdik-lib';
 import {TreeDemoService} from './tree-demo.service';
 import {getTreeColumns} from './columns';
 import {Subscription} from 'rxjs';
-import {TreeBuilder} from '../../lib/tree';
 
 @Component({
   selector: 'app-tree-table-demo',
@@ -16,25 +15,31 @@ import {TreeBuilder} from '../../lib/tree';
 })
 export class TreeTableDemoComponent implements OnInit, OnDestroy {
 
-  treeTable: TreeTable;
   settings: Settings = new Settings({
     selectionMultiple: true,
     selectionMode: 'checkbox',
     filter: false,
     sortable: false,
   });
-  columns: Column[];
+  treeTable: TreeTable;
   flattenTreeTable: TreeTable;
 
   private subscriptions: Subscription[] = [];
 
   constructor(private treeService: TreeDemoService,  private http: HttpClient) {
-    this.columns = getTreeColumns();
-    this.treeTable = new TreeTable(this.columns, this.settings, this.treeService);
+    const columns = getTreeColumns();
+    for (const column of columns) {
+      column.editable = false;
+    }
+    this.treeTable = new TreeTable(columns, this.settings, this.treeService);
     this.treeTable.pager.perPage = 1000;
-    this.treeTable.getIconFunc = (node) => (!node.isLeaf()) ? 'tree-icon tree-folder' : 'tree-icon tree-file';
+    this.treeTable.getIconFunc = (node) => (!node.isLeaf()) ? 'dt-icon-folder' : 'dt-icon-file';
 
-    this.flattenTreeTable = new TreeTable(this.columns, this.settings, null);
+    const columns2 = getTreeColumns();
+    for (const column of columns) {
+      column.editable = false;
+    }
+    this.flattenTreeTable = new TreeTable(columns2, this.settings, null);
   }
 
   ngOnInit() {

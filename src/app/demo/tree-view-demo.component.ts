@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {TreeNode} from '../../lib/tree-view';
-import {MenuItem} from '../../lib/common';
+import {TreeNode, MenuItem} from 'ng-mazdik-lib';
 import {TreeDemoService} from './tree-demo.service';
 
 @Component({
@@ -22,7 +21,7 @@ export class TreeViewDemoComponent implements OnInit {
 
   selectedNode: TreeNode;
   items: MenuItem[];
-  getIconFunc = (node) => (!node.isLeaf()) ? 'tree-icon tree-folder' : 'tree-icon tree-file';
+  getIconFunc = (node) => (!node.isLeaf()) ? 'dt-icon-folder' : 'dt-icon-file';
 
   constructor(public treeService: TreeDemoService) {}
 

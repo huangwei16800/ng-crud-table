@@ -1,8 +1,8 @@
-import {Component, OnInit, ViewChild, TemplateRef} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewChild, TemplateRef} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Column, Settings, DataTable, Row} from '../../lib/ng-data-table';
+import {ColumnBase, Settings, DataTable, Row, Tree, TreeNode, TreeFlattener} from 'ng-mazdik-lib';
 import {getTreeColumns} from './columns';
-import {Tree, TreeNode, TreeFlattener} from '../../lib/tree';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-tree-table-custom-demo',
@@ -20,13 +20,14 @@ import {Tree, TreeNode, TreeFlattener} from '../../lib/tree';
       </i>
       <span class="datatable-tree-node-content"
           (dblclick)="onExpand(row)">
+          <i [ngClass]="getIcon(row)"></i>
           {{row.name}}
       </span>
       </div>
   </ng-template>
   `
 })
-export class TreeTableCustomDemoComponent implements OnInit {
+export class TreeTableCustomDemoComponent implements OnInit, OnDestroy {
 
   dataTable: DataTable;
   settings: Settings = new Settings({
@@ -36,29 +37,40 @@ export class TreeTableCustomDemoComponent implements OnInit {
     rowClass: this.getRowClass,
     isEditableCellProp: '$$editable',
     rowHeightProp: '$$height',
+    selectionMultiple: true,
+    selectionMode: 'checkbox',
   });
-  columns: Column[];
 
-  @ViewChild('cellTemplate') cellTemplate: TemplateRef<any>;
-  @ViewChild('cellNodeTemplate') cellNodeTemplate: TemplateRef<any>;
+  @ViewChild('cellTemplate', {static: true}) cellTemplate: TemplateRef<any>;
+  @ViewChild('cellNodeTemplate', {static: true}) cellNodeTemplate: TemplateRef<any>;
 
   private treeFlattener: TreeFlattener;
+  private subscriptions: Subscription[] = [];
 
   constructor(private http: HttpClient) {
-    this.columns = getTreeColumns();
-    this.dataTable = new DataTable(this.columns, this.settings, null);
+    const columns = getTreeColumns();
+    this.dataTable = new DataTable(columns, this.settings, null);
     this.dataTable.pager.perPage = 1000;
     this.treeFlattener = new TreeFlattener(this.transformer);
   }
 
   ngOnInit() {
-    this.dataTable.columns[0].cellTemplate = this.cellNodeTemplate;
-    this.dataTable.columns[3].cellTemplate = this.cellTemplate;
+    this.dataTable.columns[1].cellTemplate = this.cellNodeTemplate;
+    this.dataTable.columns[4].cellTemplate = this.cellTemplate;
     this.dataTable.events.onLoading(true);
     this.http.get<any[]>('assets/tree.json').subscribe(data => {
       this.dataTable.rows = this.prepareTreeData(data);
       this.dataTable.events.onLoading(false);
     });
+
+    const subCheckbox = this.dataTable.events.checkboxSource$.subscribe((event) => {
+      this.selectionToggle(event);
+    });
+    this.subscriptions.push(subCheckbox);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   transformer = (node: TreeNode, level: number) => {
@@ -91,7 +103,7 @@ export class TreeTableCustomDemoComponent implements OnInit {
     };
   }
 
-  getSum(row: Row, column: Column, value: any) {
+  getSum(row: Row, column: ColumnBase, value: any) {
     if (value) {
       return value;
     }
@@ -144,6 +156,18 @@ export class TreeTableCustomDemoComponent implements OnInit {
       }
     }
     return results;
+  }
+
+  selectionToggle(row: Row): void {
+    let descendants = this.getDescendants(row, this.dataTable.rows);
+    descendants = descendants.map(x => x.$$index);
+    this.dataTable.selection.isSelected(row.$$index)
+      ? this.dataTable.selection.select(...descendants)
+      : this.dataTable.selection.deselect(...descendants);
+  }
+
+  getIcon(row: any) {
+    return row.hasChildren ? 'dt-icon-folder' : 'dt-icon-file';
   }
 
 }

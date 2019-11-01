@@ -1,14 +1,28 @@
-# Angular data table component
+# Angular UI component library
 
-Feature-rich data table component for Angular with CRUD operations. (<a target="_blank" href="https://mazdik.github.io/ng-crud-table/">Demo</a>)  
+### Installation
+
+```
+npm i ng-mazdik-lib --save
+```
+
+### Styles
+Add global styles in angular.json
+```json
+"styles": [
+  "src/styles.css",
+  "node_modules/ng-mazdik-lib/styles/bundled.css"
+],
+```
+
+<a target="_blank" href="https://mazdik.github.io/ng-mazdik/">Demos</a>  
 
 ### Sample crud-table
+Feature-rich data table component for Angular with CRUD operations.
 ```typescript
 import {Component}  from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Column, CdtSettings, DataSource, DataManager} from './lib/ng-crud-table';
-import {Validators} from './lib/common';
-import {NotifyService} from './lib/notify/notify.service';
+import {ColumnBase, CdtSettings, DataSource, DataManager, Validators, NotifyService} from 'ng-mazdik-lib';
 import {YiiService} from './samples/services';
 
 @Component({
@@ -20,7 +34,7 @@ import {YiiService} from './samples/services';
 export class PlayersComponent {
 
     dataManager: DataManager;
-    columns: Column[] = [
+    columns: ColumnBase[] = [
         {
             title: 'Id', 
             name: 'id', 
@@ -119,7 +133,7 @@ export class PlayersComponent {
 ```
 ### Sample data-table
 ```typescript
-import {Column, Settings, DataTable} from './lib/ng-data-table';
+import {ColumnBase, Settings, DataTable} from 'ng-mazdik-lib';
 
 @Component({
   selector: 'app-data-table-demo',
@@ -129,7 +143,7 @@ import {Column, Settings, DataTable} from './lib/ng-data-table';
 export class DataTableDemoComponent {
 
   dataTable: DataTable;
-  columns: Column[];
+  columns: ColumnBase[];
   settings: Settings;
 
   constructor() {
@@ -140,7 +154,7 @@ export class DataTableDemoComponent {
 ```
 ### Sample tree-table
 ```typescript
-import {Column, Settings, TreeTable} from './lib/ng-tree-table';
+import {ColumnBase, Settings, TreeTable} from 'ng-mazdik-lib';
 import {TreeDemoService} from './tree-demo.service';
 
 @Component({
@@ -152,7 +166,7 @@ export class TreeTableDemoComponent {
 
   treeTable: TreeTable;
   settings: Settings;
-  columns: Column[];
+  columns: ColumnBase[];
 
   constructor(private treeService: TreeDemoService) {
     this.treeTable = new TreeTable(this.columns, this.settings, this.treeService);
@@ -224,8 +238,8 @@ export interface PageMetadata {
 
 | Attribute        | Type       | Default | Description |
 |------------------|------------|---------|-------------|
-| title            | string     | null    |             |
 | name             | string     | null    |             |
+| title            | string     | null    |             |
 | sortable         | boolean    | true    |             |
 | filter           | boolean    | true    |             |
 | options          | SelectItem[] | null | |
@@ -264,8 +278,6 @@ export interface PageMetadata {
 | multipleSort     | boolean    | false   |             |
 | trackByProp      | string     | null    |             |
 | groupRowsBy      | string[]   | null    |             |
-| clearAllFiltersIcon | boolean | true    |             |
-| columnResizeMode | simple / aminated | simple |       |
 | selectionMultiple | boolean   | false   |             |
 | selectionMode    | checkbox / radio | null |          |
 | virtualScroll    | boolean    | false   |             |
@@ -276,7 +288,6 @@ export interface PageMetadata {
 | hoverEvents      | boolean    | false   | mouseover/mouseout |
 | contextMenu      | boolean    | false   | event       |
 | editMode         | editCellOnDblClick / editProgrammatically | editCellOnDblClick |             |
-| actionColumnWidth | number    | 40      | px, 0 - hide |
 | paginator        | boolean    | true    |              |
 | rowHeightProp    | string     | null    | row.$$height |
 | isEditableCellProp | string   | null    | row.$$editable |
@@ -292,6 +303,7 @@ export interface PageMetadata {
 | exportAction     | boolean    | false   | csv         |
 | columnToggleAction | boolean  | false   |             |
 | clearAllFiltersAction | boolean | false |             |
+| clearAllFiltersIcon | boolean | true    |             |
 
 
 ```typescript
@@ -322,13 +334,13 @@ private subscriptions: Subscription[] = [];
 
 ### Sample translate
 ```typescript
-import {DtMessages} from '../lib/dt-translate';
+import {DtMessages, DtMessagesEn} from 'ng-mazdik-lib';
 
-messages: DtMessages = <DtMessages>{
+messages: DtMessages = new DtMessagesEn({
   empty: 'No data to display',
   titleDetailView: 'Item details',
   titleCreate: 'Create a new item'
-};
+});
 this.dataManager = new DataManager(this.columns, this.settings, this.service, this.messages);
 ```
 
@@ -350,10 +362,10 @@ this.dataManager = new DataManager(this.columns, this.settings, this.service, th
 | dt-toolbar                     |                    |
 | tree                           |                    |
 | app-tree-view                  |                    |
+| app-dual-list-box              |                    |
 | [appResizable]                 |                    |
 | [appDraggable]                 |                    |
 | [appDroppable]                 | html5              |
-| app-dual-list-box              |                    |
 | [appDropdown]                  |                    |
 
 ### Templates
@@ -361,6 +373,5 @@ this.dataManager = new DataManager(this.columns, this.settings, this.service, th
 <app-data-table[table]="table">
   <ng-template dtHeaderTemplate></ng-template>
   <ng-template dtRowGroupTemplate let-row="row"></ng-template>
-  <ng-template dtRowActionTemplate let-row="row"></ng-template>
 </app-data-table>
 ```
